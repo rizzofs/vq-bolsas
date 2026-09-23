@@ -55,6 +55,8 @@ import {
   Star,
   Eye,
   ZoomIn,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 
 export default function AdminPage() {
@@ -103,6 +105,9 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<
     'pedidos' | 'taller' | 'stock_materiales' | 'compras' | 'reportes' | 'clientes' | 'productos' | 'recompra' | 'calculadora' | 'instagram'
   >('pedidos');
+
+  // Estado para colapsar/mostrar resumen de métricas en móvil
+  const [showKpis, setShowKpis] = useState(true);
 
   // Filtros de Pedidos & Búsqueda
   const [orderSearch, setOrderSearch] = useState('');
@@ -911,72 +916,96 @@ export default function AdminPage() {
 
       {/* Main Admin Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full space-y-6">
-        {/* KPI Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-            <div>
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
-                Total Ventas
-              </span>
-              <span className="text-xl font-black text-slate-900 mt-0.5 block">
-                ${totalVentas.toLocaleString('es-AR')}
-              </span>
-              <span className="text-[10px] text-slate-500">{orders.length} pedidos</span>
-            </div>
-            <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl">
-              <ShoppingBag className="w-5 h-5" />
-            </div>
+        {/* Header Resumen & Toggle para móvil */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs font-black text-slate-700 uppercase tracking-wider">
+              Resumen Rápido
+            </span>
           </div>
-
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-            <div>
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
-                Clientes Registrados
-              </span>
-              <span className="text-xl font-black text-indigo-600 mt-0.5 block">
-                {customers.length} clientes
-              </span>
-              <span className="text-[10px] text-indigo-600 font-medium">Logos e historial guardados</span>
-            </div>
-            <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl">
-              <Users className="w-5 h-5" />
-            </div>
-          </div>
-
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-            <div>
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
-                Cobrado (Señas)
-              </span>
-              <span className="text-xl font-black text-green-600 mt-0.5 block">
-                ${totalCobrado.toLocaleString('es-AR')}
-              </span>
-              <span className="text-[10px] text-green-600 font-medium">Ingresos en caja</span>
-            </div>
-            <div className="p-2.5 bg-green-50 text-green-600 rounded-xl">
-              <CheckCircle className="w-5 h-5" />
-            </div>
-          </div>
-
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-            <div>
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
-                Stock Insumos
-              </span>
-              <span className="text-xl font-black text-slate-900 mt-0.5 block">
-                {materials.length} materiales
-              </span>
-              {materialesBajoStock.length > 0 ? (
-                <span className="text-[10px] text-red-600 font-bold">⚠️ {materialesBajoStock.length} con stock bajo</span>
-              ) : (
-                <span className="text-[10px] text-green-600 font-medium">Niveles óptimos</span>
-              )}
-            </div>
-            <div className={`p-2.5 rounded-xl ${materialesBajoStock.length > 0 ? 'bg-red-50 text-red-600' : 'bg-slate-100 text-slate-600'}`}>
-              <Archive className="w-5 h-5" />
-            </div>
-          </div>
+          <button
+            type="button"
+            onClick={() => setShowKpis(!showKpis)}
+            className="text-[11px] font-bold text-slate-500 hover:text-slate-800 bg-white hover:bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-xl flex items-center gap-1 transition-colors shadow-2xs"
+          >
+            <span>{showKpis ? 'Ocultar' : 'Ver Métricas'}</span>
+            {showKpis ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+          </button>
         </div>
+
+        {/* KPI Cards (Grid compacto 2x2 en móvil) */}
+        {showKpis && (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 animate-fadeIn">
+            {/* Total Ventas */}
+            <div className="bg-white p-3 sm:p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+              <div>
+                <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+                  Total Ventas
+                </span>
+                <span className="text-sm sm:text-xl font-black text-slate-900 mt-0.5 block">
+                  ${totalVentas.toLocaleString('es-AR')}
+                </span>
+                <span className="text-[10px] text-slate-500">{orders.length} pedidos</span>
+              </div>
+              <div className="p-1.5 sm:p-2.5 bg-blue-50 text-blue-600 rounded-xl">
+                <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5" />
+              </div>
+            </div>
+
+            {/* Clientes Registrados */}
+            <div className="bg-white p-3 sm:p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+              <div>
+                <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+                  Clientes
+                </span>
+                <span className="text-sm sm:text-xl font-black text-indigo-600 mt-0.5 block">
+                  {customers.length}
+                </span>
+                <span className="text-[10px] text-indigo-600 font-medium hidden sm:inline">Logos guardados</span>
+                <span className="text-[10px] text-indigo-600 font-medium sm:hidden">Registrados</span>
+              </div>
+              <div className="p-1.5 sm:p-2.5 bg-indigo-50 text-indigo-600 rounded-xl">
+                <Users className="w-4 h-4 sm:w-5 sm:h-5" />
+              </div>
+            </div>
+
+            {/* Cobrado / Señas */}
+            <div className="bg-white p-3 sm:p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+              <div>
+                <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+                  Cobrado (Señas)
+                </span>
+                <span className="text-sm sm:text-xl font-black text-green-600 mt-0.5 block">
+                  ${totalCobrado.toLocaleString('es-AR')}
+                </span>
+                <span className="text-[10px] text-green-600 font-medium">En caja</span>
+              </div>
+              <div className="p-1.5 sm:p-2.5 bg-green-50 text-green-600 rounded-xl">
+                <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+              </div>
+            </div>
+
+            {/* Stock Insumos */}
+            <div className="bg-white p-3 sm:p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+              <div>
+                <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+                  Insumos
+                </span>
+                <span className="text-sm sm:text-xl font-black text-slate-900 mt-0.5 block">
+                  {materials.length} mat.
+                </span>
+                {materialesBajoStock.length > 0 ? (
+                  <span className="text-[10px] text-red-600 font-bold">⚠️ {materialesBajoStock.length} bajo</span>
+                ) : (
+                  <span className="text-[10px] text-green-600 font-medium">Óptimo</span>
+                )}
+              </div>
+              <div className={`p-1.5 sm:p-2.5 rounded-xl ${materialesBajoStock.length > 0 ? 'bg-red-50 text-red-600' : 'bg-slate-100 text-slate-600'}`}>
+                <Archive className="w-4 h-4 sm:w-5 sm:h-5" />
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Banner de Pedidos Atrasados / Requieren Atención Inmediata */}
         {ordersWithAlerts.length > 0 && (
